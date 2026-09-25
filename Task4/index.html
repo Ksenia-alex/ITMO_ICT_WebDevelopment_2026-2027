@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Задание 4 - Чат на сокетах - Лабораторная работа №1</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "\u0417\u0430\u0434\u0430\u043d\u0438\u0435 4 - \u0427\u0430\u0442 \u043d\u0430 \u0441\u043e\u043a\u0435\u0442\u0430\u0445";
+        var mkdocs_page_input_path = "Task4.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Лабораторная работа №1
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Главная</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../Task1/">Задание 1 - Обмен сообщениями по UDP</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../Task2/">Задание 2 - Вычисления через TCP</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../Task3/">Задание 3 - Раздача HTML-страницы по HTTP</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">Задание 4 - Чат на сокетах</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#_1">Задача</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#_2">Теория</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#_3">Код сервера</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#_4">Код клиента</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#_5">Запуск</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#_6">Пример</a>
+    </li>
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../Task5/">Задание 5 - Простой веб-сервер</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Лабораторная работа №1</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Задание 4 - Чат на сокетах</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="4-">Задание 4 - Чат на сокетах</h1>
+<h3 id="_1">Задача</h3>
+<p>Реализовать многопользовательский чат на TCP. Требования:<br />
+- обслуживание нескольких клиентов;<br />
+- идентификация пользователей;<br />
+- возможность выйти из чата;<br />
+- один клиентский скрипт, запускаемый несколько раз</p>
+<h3 id="_2">Теория</h3>
+<p>Сервер держит список активных подключений и рассылает входящие сообщения всем. Каждое соединение обслуживается отдельным потоком. В Java потоки — через <code>ExecutorService</code> или <code>Thread</code>, список клиентов — <code>ConcurrentHashMap</code></p>
+<h3 id="_3">Код сервера</h3>
+<pre><code class="language-java">package task4;
+
+import java.io.*;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.concurrent.ConcurrentHashMap;
+
+public class ChatServer {
+  private static final int PORT = 8080;
+  private static final ConcurrentHashMap&lt;String, ClientHandler&gt; clients = new ConcurrentHashMap&lt;&gt;();
+
+  public static void main(String[] args) throws IOException {
+    new ChatServer().start(PORT);
+  }
+
+  public void start(int port) throws IOException {
+    try (ServerSocket serverSocket = new ServerSocket(port)){
+      System.out.println(&quot;The server is running on port 8080...&quot;);
+
+      while (true) {
+        Socket clientSocket = serverSocket.accept();
+        ClientHandler handler = new ClientHandler(clientSocket);
+        new Thread(handler).start();
+      }
+    }
+  }
+
+  private void broadcast(String message, String nickName) {
+    for (ClientHandler client : clients.values()) {
+      if (!client.nickName.equals(nickName)) client.send(message);
+    }
+  }
+
+  private void broadcastSystem(String message) {
+    for (ClientHandler client : clients.values()) client.send(message);
+  }
+
+  private class ClientHandler implements Runnable {
+    private final Socket clientSocket;
+    private BufferedReader input;
+    private PrintWriter output;
+    private String nickName;
+
+    ClientHandler(Socket socket) {
+      this.clientSocket = socket;
+    }
+
+    @Override
+    public void run() {
+      try {
+        input = new BufferedReader(new InputStreamReader(clientSocket.getInputStream(), &quot;UTF-8&quot;));
+        output = new PrintWriter(new OutputStreamWriter(clientSocket.getOutputStream(), &quot;UTF-8&quot;), true);
+
+        if (!registerUser()) return;
+
+        broadcastSystem(nickName + &quot; joined the chat&quot;);
+
+        String line;
+        while ((line = input.readLine()) != null) {
+          if (line.equalsIgnoreCase(&quot;/exit&quot;)) break;
+          else if (line.trim().isEmpty()) continue;
+          else broadcast(nickName + &quot;: &quot; + line, nickName);
+        }
+      } catch (IOException e) {
+        System.out.println(&quot;Connection to &quot; + safeName() + &quot; has been interrupted: &quot; + e.getMessage());
+      } finally {
+        disconnect();
+      }
+    }
+
+    private boolean registerUser() throws IOException {
+      output.println(&quot;Enter your nickname:&quot;);
+      while (true) {
+        String name = input.readLine();
+        if (name == null) return false;
+        name = name.trim();
+        if (name.isEmpty()) {
+          output.println(&quot;The name cannot be empty. Please try again:&quot;);
+          continue;
+        }
+        if (clients.containsKey(name)) {
+          output.println(&quot;This name is already taken. Enter another:&quot;);
+          continue;
+        }
+        nickName = name;
+        clients.put(nickName, this);
+        output.println(&quot;OK&quot;);
+        return true;
+      }
+    }
+
+    void send(String message) {
+      output.println(message);
+    }
+
+    private String safeName() {
+      return nickName != null ? nickName : &quot;unknown&quot;;
+    }
+
+    private void disconnect() {
+      if (nickName != null) {
+        clients.remove(nickName);
+        broadcastSystem(nickName + &quot; left the chat&quot;);
+      }
+      try {
+        clientSocket.close();
+      } catch (IOException ignored) { }
+    }
+  }
+}
+</code></pre>
+<h3 id="_4">Код клиента</h3>
+<pre><code class="language-java">package task4;
+
+import java.io.*;
+import java.net.Socket;
+
+public class ChatClient {
+  public static void main(String[] args) throws IOException {
+    String HOST = &quot;localhost&quot;;
+    int PORT = 8080;
+
+    Socket socket = new Socket(HOST, PORT);
+    BufferedReader input = new BufferedReader(new InputStreamReader(socket.getInputStream(), &quot;UTF-8&quot;));
+    PrintWriter output = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), &quot;UTF-8&quot;), true);
+    BufferedReader console = new BufferedReader(new InputStreamReader(System.in, &quot;UTF-8&quot;));
+
+    System.out.println(input.readLine());
+    String response;
+    do {
+      String nickName = console.readLine();
+      output.println(nickName);
+      response = input.readLine();
+      if (response == null) {
+        System.out.println(&quot;The server closed the connection&quot;);
+        return;
+      }
+      if (!response.equals(&quot;OK&quot;)) System.out.println(response);
+    } while (!response.equals(&quot;OK&quot;));
+
+    System.out.println(&quot;Connection established. To exit, enter /exit&quot;);
+
+    Thread readerThread = new Thread(() -&gt; {
+      try {
+        String message;
+        while ((message = input.readLine()) != null) System.out.println(message);
+      } catch (IOException e) {
+        System.out.println(&quot;The connection is closed&quot;);
+      }
+    });
+    readerThread.setDaemon(true);
+    readerThread.start();
+
+    String userInput;
+    while ((userInput = console.readLine()) != null) {
+      if (userInput.trim().isEmpty()) continue;
+      output.println(userInput);
+      if (userInput.equalsIgnoreCase(&quot;/exit&quot;)) break;
+    }
+    System.out.println(&quot;You have left the chat&quot;);
+    socket.close();
+  }
+}
+
+</code></pre>
+<h3 id="_5">Запуск</h3>
+<pre><code># Терминал 1
+java -cp out task4.ChatServer
+
+# Терминал 2
+java -cp out task4.ChatClient
+
+# Терминал 3
+java -cp out task4.ChatClient
+
+# Терминал 4
+java -cp out task4.ChatClient
+
+</code></pre>
+<h3 id="_6">Пример</h3>
+<p><img alt="img.png" src="../images/task4.png" /></p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../Task3/" class="btn btn-neutral float-left" title="Задание 3 - Раздача HTML-страницы по HTTP"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../Task5/" class="btn btn-neutral float-right" title="Задание 5 - Простой веб-сервер">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../Task3/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../Task5/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

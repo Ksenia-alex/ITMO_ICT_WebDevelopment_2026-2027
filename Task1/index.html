@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Задание 1 - Обмен сообщениями по UDP - Лабораторная работа №1</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "\u0417\u0430\u0434\u0430\u043d\u0438\u0435 1 - \u041e\u0431\u043c\u0435\u043d \u0441\u043e\u043e\u0431\u0449\u0435\u043d\u0438\u044f\u043c\u0438 \u043f\u043e UDP";
+        var mkdocs_page_input_path = "Task1.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Лабораторная работа №1
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Главная</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">Задание 1 - Обмен сообщениями по UDP</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#_1">Задача</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#_2">Теория</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#_3">Код сервера</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#_4">Код клиента</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#_5">Запуск</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#_6">Пример</a>
+    </li>
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../Task2/">Задание 2 - Вычисления через TCP</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../Task3/">Задание 3 - Раздача HTML-страницы по HTTP</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../Task4/">Задание 4 - Чат на сокетах</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../Task5/">Задание 5 - Простой веб-сервер</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Лабораторная работа №1</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Задание 1 - Обмен сообщениями по UDP</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="1-udp">Задание 1 - Обмен сообщениями по UDP</h1>
+<h3 id="_1">Задача</h3>
+<p>Клиент отправляет серверу <code>Hello, server</code>, сервер выводит это сообщение и отвечает <code>Hello, client</code>, которое выводится у клиента. Протокол — UDP</p>
+<h3 id="_2">Теория</h3>
+<p>UDP - протокол без установления соединения. Отправитель просто посылает датаграмму, не дожидаясь подтверждения. Это быстрее TCP, но не гарантирует ни доставку, ни порядок пакетов</p>
+<p>В Java работа с UDP — это <code>DatagramSocket</code>, <code>DatagramPacket</code>, <code>InetAddress</code></p>
+<h3 id="_3">Код сервера</h3>
+<pre><code class="language-java">package task1;
+
+import java.net.*;
+
+public class UDPServer {
+  public static void main(String[] args) throws Exception {
+    int PORT = 8080;
+
+    DatagramSocket socket = new DatagramSocket(PORT);
+    System.out.println(&quot;The server is running on port 8080...&quot;);
+    byte[] buffer = new byte[1024];
+
+    DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
+    socket.receive(packet);
+    String clientMsg = new String(packet.getData(), 0, packet.getLength(), &quot;UTF-8&quot;);
+    System.out.println(&quot;Client message: &quot; + clientMsg);
+
+    String response = &quot;Hello, client&quot;;
+    byte[] encodedResponse = response.getBytes(&quot;UTF-8&quot;);
+    DatagramPacket responsePacket = new DatagramPacket(encodedResponse, encodedResponse.length, packet.getAddress(), packet.getPort());
+    socket.send(responsePacket);
+
+    socket.close();
+  }
+}
+</code></pre>
+<h3 id="_4">Код клиента</h3>
+<pre><code class="language-java">package task1;
+
+import java.net.*;
+
+public class UDPClient {
+  public static void main(String[] args) throws Exception {
+    String HOST = &quot;localhost&quot;;
+    int PORT = 8080;
+
+    DatagramSocket socket = new DatagramSocket();
+    InetAddress serverAddress = InetAddress.getByName(HOST);
+
+    String request = &quot;Hello, server&quot;;
+    byte[] encodedRequest = request.getBytes(&quot;UTF-8&quot;);
+    DatagramPacket requestPacket = new DatagramPacket(encodedRequest, encodedRequest.length, serverAddress, PORT);
+    socket.send(requestPacket);
+
+    byte[] buffer = new byte[1024];
+    DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
+    socket.receive(packet);
+    String serverMsg = new String(packet.getData(), 0, packet.getLength(), &quot;UTF-8&quot;);
+    System.out.println(&quot;Server message: &quot; + serverMsg);
+
+    socket.close();
+  }
+}
+</code></pre>
+<h3 id="_5">Запуск</h3>
+<pre><code>javac -d out src/task1/UDPServer.java src/task1/UDPClient.java
+
+# Терминал 1
+java -cp out task1.UDPServer
+
+# Терминал 2
+java -cp out task1.UDPClient
+</code></pre>
+<h3 id="_6">Пример</h3>
+<p><img alt="../images/task1.png" src="../images/task1.png" /></p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href=".." class="btn btn-neutral float-left" title="Главная"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../Task2/" class="btn btn-neutral float-right" title="Задание 2 - Вычисления через TCP">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href=".." style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../Task2/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
