@@ -3,9 +3,9 @@
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="description" content="None" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="description" content="None" /><link rel="canonical" href="https://ksenia-alex.github.io/ITMO_ICT_WebDevelopment_2026-2027/" />
       <link rel="shortcut icon" href="img/favicon.ico" />
-    <title>Лабораторная работа №1</title>
+    <title>Лабораторная работа №2</title>
     <link rel="stylesheet" href="css/theme.css" />
     <link rel="stylesheet" href="css/theme_extra.css" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
@@ -14,7 +14,7 @@
         // Current page data
         var mkdocs_page_name = "\u0413\u043b\u0430\u0432\u043d\u0430\u044f";
         var mkdocs_page_input_path = "index.md";
-        var mkdocs_page_url = null;
+        var mkdocs_page_url = "/ITMO_ICT_WebDevelopment_2026-2027/";
       </script>
     
     <!--[if lt IE 9]>
@@ -30,7 +30,7 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
     <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
-          <a href="." class="icon icon-home"> Лабораторная работа №1
+          <a href="." class="icon icon-home"> Лабораторная работа №2
         </a><div role="search">
   <form id ="rtd-search-form" class="wy-form" action="./search.html" method="get">
       <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
@@ -44,29 +44,17 @@
     <ul class="current">
     <li class="toctree-l2"><a class="reference internal" href="#_1">Цель работы</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#_2">Задания</a>
+    <li class="toctree-l2"><a class="reference internal" href="#_2">Задание</a>
     </li>
     </ul>
                 </li>
               </ul>
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="Task1/">Задание 1 - Обмен сообщениями по UDP</a>
+                <li class="toctree-l1"><a class="reference internal" href="models/">Модель данных</a>
                 </li>
               </ul>
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="Task2/">Задание 2 - Вычисления через TCP</a>
-                </li>
-              </ul>
-              <ul>
-                <li class="toctree-l1"><a class="reference internal" href="Task3/">Задание 3 - Раздача HTML-страницы по HTTP</a>
-                </li>
-              </ul>
-              <ul>
-                <li class="toctree-l1"><a class="reference internal" href="Task4/">Задание 4 - Чат на сокетах</a>
-                </li>
-              </ul>
-              <ul>
-                <li class="toctree-l1"><a class="reference internal" href="Task5/">Задание 5 - Простой веб-сервер</a>
+                <li class="toctree-l1"><a class="reference internal" href="backend/">Серверная часть</a>
                 </li>
               </ul>
       </div>
@@ -76,7 +64,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
       <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href=".">Лабораторная работа №1</a>
+          <a href=".">Лабораторная работа №2</a>
         
       </nav>
       <div class="wy-nav-content">
@@ -92,51 +80,23 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div class="section" itemprop="articleBody">
               
-                <h1 id="no1">Лабораторная работа №1. Работа с сокетами</h1>
+                <h1 id="no2-django">Лабораторная работа №2. Простой сайт на Django</h1>
 <h2 id="_1">Цель работы</h2>
-<p>Понять принципы межсокетного взаимодейсвтия в вебе. Научиться реализовывать базовую архитектуру клиент-сервер</p>
-<h2 id="_2">Задания</h2>
-<table>
-<thead>
-<tr>
-<th>№</th>
-<th>Тема</th>
-<th>Файлы</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1</td>
-<td>Обмен сообщениями</td>
-<td><code>UDPServer.java</code>, <code>UDPClient.java</code></td>
-</tr>
-<tr>
-<td>2</td>
-<td>Вычисления (квадратное уравнение)</td>
-<td><code>TCPServer.java</code>, <code>TCPClient.java</code></td>
-</tr>
-<tr>
-<td>3</td>
-<td>Раздача HTML-страницы</td>
-<td><code>HTTPServer.java</code>, <code>index.html</code></td>
-</tr>
-<tr>
-<td>4</td>
-<td>Многопользовательский чат</td>
-<td><code>ChatServer.java</code>, <code>ChatClient.java</code></td>
-</tr>
-<tr>
-<td>5</td>
-<td>Веб-сервер GET/POST</td>
-<td><code>WebServer.java</code></td>
-</tr>
-</tbody>
-</table>
+<p>Овладеть практическими навыками и умениями реализации web-сервисов средствами Django</p>
+<h2 id="_2">Задание</h2>
+<p>Реализовать сайт - табло победителей автогонок  </p>
+<p>Табло должно отображать информацию об участниках автогонок: ФИО участника, название команды, описание автомобиля, описание участника, опыт и класс участника.</p>
+<p>Необходимо реализовать следующий функционал:</p>
+<p>Регистрация новых пользователей.
+Просмотр автогонок и регистрацию гонщиков. Пользователь должен иметь возможность редактирования и удаления своих регистраций.
+Написание отзывов и комментариев к автогонкам. Предварительно комментатор должен зарегистрироваться. При добавлении комментариев должны сохраняться даты заезда, текст комментария, тип комментария (вопрос о сотрудничестве, вопрос о гонках, иное), рейтинг (1-10), информация о комментаторе.
+Администратор должен иметь возможность указания времени заезда и результата средствами Django-admin.
+В клиентской части должна формироваться таблица всех заездов и результатов конкретной гонки.</p>
               
             </div>
           </div><footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
-        <a href="Task1/" class="btn btn-neutral float-right" title="Задание 1 - Обмен сообщениями по UDP">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="models/" class="btn btn-neutral float-right" title="Модель данных">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
 
   <hr/>
@@ -160,7 +120,7 @@
     
     
     
-      <span><a href="Task1/" style="color: #fcfcfc">Next &raquo;</a></span>
+      <span><a href="models/" style="color: #fcfcfc">Next &raquo;</a></span>
     
   </span>
 </div>
@@ -180,5 +140,5 @@
 
 <!--
 MkDocs version : 1.6.1
-Build Date UTC : 2026-09-25 09:47:00.013758+00:00
+Build Date UTC : 2026-10-23 10:26:25.646817+00:00
 -->

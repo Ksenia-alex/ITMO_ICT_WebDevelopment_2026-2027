@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://ksenia-alex.github.io/ITMO_ICT_WebDevelopment_2026-2027/backend/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Серверная часть - Лабораторная работа №2</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "\u0421\u0435\u0440\u0432\u0435\u0440\u043d\u0430\u044f \u0447\u0430\u0441\u0442\u044c";
+        var mkdocs_page_input_path = "backend.md";
+        var mkdocs_page_url = "/ITMO_ICT_WebDevelopment_2026-2027/backend/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Лабораторная работа №2
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Главная</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../models/">Модель данных</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">Серверная часть</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#1-racesurlspy">1. Маршрутизация (races/urls.py)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#_2">Группа «Аутентификация»</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#_3">Группа «Профиль»</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#_4">Группа «Гонки»</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#_5">Группа «Регистрация на гонку»</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#_6">Группа «Комментарии и табло»</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#2-formspy">2. Формы (forms.py)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#userregistrationform">UserRegistrationForm</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#userprofileform">UserProfileForm</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#autoform">AutoForm</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#commentform">CommentForm</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#resultform">ResultForm</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#3-viewspy">3. Представления (views.py)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#_7">Общие миксины</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#fbv">Функциональные представления (FBV)</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#register">register</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#profile-profile_edit">profile и profile_edit</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#public_profile">public_profile</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#participants">participants</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#register_for_race-unregister_from_race">register_for_race и unregister_from_race</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#add_comment">add_comment</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#results_table">results_table</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#cbv">Классовые представления (CBV)</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#racelistview">RaceListView</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#racedetailview">RaceDetailView</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#racecreateview-raceupdateview">RaceCreateView / RaceUpdateView</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#resultcreateview">ResultCreateView</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#autocreateview">AutoCreateView</a>
+    </li>
+        </ul>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#4-django-admin-adminpy">4. Django-admin (admin.py)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#user-useradmin">User — расширенный UserAdmin</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#auto">Auto</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#race">Race</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#result">Result</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#registration">Registration</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#comment">Comment</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#5">5. Шаблоны — кратко</a>
+    </li>
+    </ul>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Лабораторная работа №2</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Серверная часть</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="_1">Реализация серверной части</h1>
+<p>Серверная сторона: модели, формы, представления, маршрутизация, административная панель. Клиентская
+часть – шаблоны Bootstrap</p>
+<p>Структура приложения <code>races/</code>:</p>
+<pre><code class="language-text">races/
+├── models.py         # модели данных
+├── forms.py          # формы
+├── views.py          # представления (FBV и CBV)
+├── urls.py           # маршруты приложения
+├── admin.py          # настройка Django-admin
+├── migrations/       # миграции
+└── templates/races/  # шаблоны
+</code></pre>
+<hr />
+<h2 id="1-racesurlspy">1. Маршрутизация (<code>races/urls.py</code>)</h2>
+<p>Маршруты приложения сгруппированы по функциональности. Все они
+подключены в корневом <code>racing_site/urls.py</code> через
+<code>path("", include("races.urls"))</code> с <code>app_name = "races"</code> — это
+позволяет строить URL через <code>{% url 'races:race_detail' pk %}</code>.</p>
+<h3 id="_2">Группа «Аутентификация»</h3>
+<table>
+<thead>
+<tr>
+<th>URL</th>
+<th>Имя</th>
+<th>View</th>
+<th>Назначение</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/register/</code></td>
+<td><code>register</code></td>
+<td><code>register</code></td>
+<td>Регистрация нового пользователя</td>
+</tr>
+<tr>
+<td><code>/login/</code></td>
+<td><code>login</code></td>
+<td><code>LoginView</code></td>
+<td>Вход (из <code>django.contrib.auth.views</code>)</td>
+</tr>
+<tr>
+<td><code>/logout/</code></td>
+<td><code>logout</code></td>
+<td><code>LogoutView</code></td>
+<td>Выход (POST-форма в навбаре)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="_3">Группа «Профиль»</h3>
+<table>
+<thead>
+<tr>
+<th>URL</th>
+<th>Имя</th>
+<th>View</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/profile/</code></td>
+<td><code>profile</code></td>
+<td><code>profile</code></td>
+</tr>
+<tr>
+<td><code>/profile/edit/</code></td>
+<td><code>profile_edit</code></td>
+<td><code>profile_edit</code></td>
+</tr>
+<tr>
+<td><code>/user/&lt;int:pk&gt;/</code></td>
+<td><code>public_profile</code></td>
+<td><code>public_profile</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="_4">Группа «Гонки»</h3>
+<table>
+<thead>
+<tr>
+<th>URL</th>
+<th>Имя</th>
+<th>View</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/</code></td>
+<td><code>race_list</code></td>
+<td><code>RaceListView</code></td>
+</tr>
+<tr>
+<td><code>/race/&lt;int:pk&gt;/</code></td>
+<td><code>race_detail</code></td>
+<td><code>RaceDetailView</code></td>
+</tr>
+<tr>
+<td><code>/race/create/</code></td>
+<td><code>race_create</code></td>
+<td><code>RaceCreateView</code></td>
+</tr>
+<tr>
+<td><code>/race/&lt;int:pk&gt;/edit/</code></td>
+<td><code>race_edit</code></td>
+<td><code>RaceUpdateView</code></td>
+</tr>
+<tr>
+<td><code>/race/&lt;int:race_pk&gt;/result/add/</code></td>
+<td><code>result_create</code></td>
+<td><code>ResultCreateView</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="_5">Группа «Регистрация на гонку»</h3>
+<table>
+<thead>
+<tr>
+<th>URL</th>
+<th>Имя</th>
+<th>View</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/race/&lt;int:pk&gt;/register/</code></td>
+<td><code>register_for_race</code></td>
+<td><code>register_for_race</code></td>
+</tr>
+<tr>
+<td><code>/registration/&lt;int:pk&gt;/delete/</code></td>
+<td><code>unregister_from_race</code></td>
+<td><code>unregister_from_race</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="_6">Группа «Комментарии и табло»</h3>
+<table>
+<thead>
+<tr>
+<th>URL</th>
+<th>Имя</th>
+<th>View</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/race/&lt;int:pk&gt;/comment/</code></td>
+<td><code>add_comment</code></td>
+<td><code>add_comment</code></td>
+</tr>
+<tr>
+<td><code>/results/</code></td>
+<td><code>results_table</code></td>
+<td><code>results_table</code></td>
+</tr>
+<tr>
+<td><code>/participants/</code></td>
+<td><code>participants</code></td>
+<td><code>participants</code></td>
+</tr>
+<tr>
+<td><code>/auto/create/</code></td>
+<td><code>auto_create</code></td>
+<td><code>AutoCreateView</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="2-formspy">2. Формы (<code>forms.py</code>)</h2>
+<p>Все формы наследуют от общего миксина <strong><code>BootstrapFormMixin</code></strong>,
+который автоматически навешивает нужные CSS-классы на поля. 
+Это избавляет от ручного прописывания <code>widgets = {...}</code> в каждой форме</p>
+<pre><code class="language-python">class BootstrapFormMixin:
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            w = field.widget
+            if isinstance(w, forms.CheckboxInput):
+                cls = &quot;form-check-input&quot;
+            elif isinstance(w, (forms.Select, forms.SelectMultiple)):
+                cls = &quot;form-select&quot;
+            else:
+                cls = &quot;form-control&quot;
+            w.attrs[&quot;class&quot;] = (w.attrs.get(&quot;class&quot;, &quot;&quot;) + &quot; &quot; + cls).strip()
+</code></pre>
+<p>Логика в миксине:</p>
+<ul>
+<li>чекбокс → <code>form-check-input</code>;</li>
+<li><code>&lt;select&gt;</code> и <code>&lt;select multiple&gt;</code> → <code>form-select</code>;</li>
+<li>всё остальное (<code>text</code>, <code>email</code>, <code>date</code>, <code>number</code>, <code>textarea</code>) → <code>form-control</code>.</li>
+</ul>
+<h3 id="userregistrationform"><code>UserRegistrationForm</code></h3>
+<pre><code class="language-python">class UserRegistrationForm(BootstrapFormMixin, UserCreationForm):
+    email = forms.EmailField(required=True)
+
+    class Meta:
+        model = User
+        fields = (&quot;username&quot;, &quot;first_name&quot;, &quot;last_name&quot;, &quot;email&quot;,&quot;team&quot;, &quot;birthday&quot;, &quot;driving_experience&quot;, &quot;racer_class&quot;)
+</code></pre>
+<ul>
+<li>Наследуется от <code>UserCreationForm</code> — Django сам добавляет поля <code>password1</code> / <code>password2</code> и валидацию пароля по <code>AUTH_PASSWORD_VALIDATORS</code></li>
+<li>Дополнительно к стандартным <code>username/first_name/last_name</code> расширена полями профиля гонщика (<code>team</code>, <code>birthday</code>, <code>driving_experience</code>, <code>racer_class</code>)</li>
+<li><code>email</code> явно помечен как <code>required=True</code> — в стандартной форме Django он необязательный</li>
+</ul>
+<h3 id="userprofileform"><code>UserProfileForm</code></h3>
+<pre><code class="language-python">class UserProfileForm(BootstrapFormMixin, forms.ModelForm):
+    class Meta:
+        model = User
+        fields = (&quot;first_name&quot;, &quot;last_name&quot;, &quot;email&quot;,&quot;team&quot;, &quot;birthday&quot;, &quot;driving_experience&quot;, &quot;racer_class&quot;)
+        widgets = {
+            &quot;birthday&quot;: forms.DateInput(attrs={&quot;type&quot;: &quot;date&quot;}),
+        }
+</code></pre>
+<p><code>ModelForm</code> только для профильных полей — <code>username</code> менять нельзя. Используется на <code>/profile/edit/</code><br />
+Поле <code>birthday</code> получает <code>widget=DateInput(attrs={"type": "date"})</code>, чтобы браузер показал нативный date-picker</p>
+<h3 id="autoform"><code>AutoForm</code></h3>
+<pre><code class="language-python">class AutoForm(BootstrapFormMixin, forms.ModelForm):
+    class Meta:
+        model = Auto
+        fields = (&quot;state&quot;, &quot;make&quot;, &quot;model&quot;, &quot;color&quot;)
+        widgets = {
+            &quot;state&quot;: forms.TextInput(attrs={&quot;class&quot;: &quot;form-control&quot;, &quot;placeholder&quot;: &quot;А123БВ777&quot;}),
+            &quot;make&quot;: forms.TextInput(attrs={&quot;class&quot;: &quot;form-control&quot;, &quot;placeholder&quot;: &quot;Toyota&quot;}),
+            &quot;model&quot;: forms.TextInput(attrs={&quot;class&quot;: &quot;form-control&quot;, &quot;placeholder&quot;: &quot;Supra&quot;}),
+            &quot;color&quot;: forms.TextInput(attrs={&quot;class&quot;: &quot;form-control&quot;, &quot;placeholder&quot;: &quot;Красный&quot;}),
+        }
+</code></pre>
+<p><code>ModelForm</code> для модели <code>Auto</code> с полями <code>state / make / model / color</code></p>
+<h3 id="commentform"><code>CommentForm</code></h3>
+<pre><code class="language-python">class CommentForm(BootstrapFormMixin, forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = (&quot;text&quot;, &quot;race_date&quot;, &quot;comment_type&quot;, &quot;rating&quot;)
+        widgets = {
+            &quot;race_date&quot;: forms.DateInput(attrs={&quot;type&quot;: &quot;date&quot;}),
+            &quot;text&quot;: forms.Textarea(attrs={&quot;rows&quot;: 4}),
+        }
+</code></pre>
+<ul>
+<li>Поля <code>user</code> нет в форме — берётся из <code>request.user</code></li>
+<li><code>rating</code> валидируется на уровне модели (<code>MinValueValidator(1)</code>, <code>MaxValueValidator(10)</code>)</li>
+<li><code>race_date</code> по умолчанию инициализируется датой гонки</li>
+</ul>
+<h3 id="resultform"><code>ResultForm</code></h3>
+<p>Зависимые поля: гонщик → автомобиль</p>
+<pre><code class="language-python">class ResultForm(BootstrapFormMixin, forms.ModelForm):
+    class Meta:
+        model = Result
+        fields = (&quot;user&quot;, &quot;auto&quot;, &quot;duration&quot;)
+        widgets = {
+            &quot;duration&quot;: forms.TextInput(attrs={
+                &quot;class&quot;: &quot;form-control&quot;,
+                &quot;placeholder&quot;: &quot;ЧЧ:ММ:СС, например 00:12:34&quot;,
+            }),
+            &quot;user&quot;: forms.Select(attrs={&quot;class&quot;: &quot;form-select&quot;, &quot;id&quot;: &quot;id_user&quot;}),
+            &quot;auto&quot;: forms.Select(attrs={&quot;class&quot;: &quot;form-select&quot;, &quot;id&quot;: &quot;id_auto&quot;}),
+        }
+
+    def __init__(self, *args, race=None, user_id=None, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Участники — только зарегавшиеся на ЭТУ гонку
+        if race is not None:
+            self.fields[&quot;user&quot;].queryset = User.objects.filter(
+                registrations__race=race,
+                registrations__deleted_at__isnull=True,
+            ).distinct().order_by(&quot;last_name&quot;, &quot;first_name&quot;)
+        else:
+            self.fields[&quot;user&quot;].queryset = User.objects.none()
+        self.fields[&quot;user&quot;].empty_label = &quot;— выберите участника —&quot;
+
+        # Машины — только выбранного участника
+        if user_id:
+            autos = Auto.objects.filter(owner_id=user_id, deleted_at__isnull=True)
+        else:
+            autos = Auto.objects.none()
+        self.fields[&quot;auto&quot;].queryset = autos
+        if autos.count() == 1:
+            self.fields[&quot;auto&quot;].initial = autos.first()
+        self.fields[&quot;auto&quot;].empty_label = &quot;— сначала выберите участника —&quot;
+</code></pre>
+<ul>
+<li>Список гонщиков – только те, кто зарегистрирован на эту гонку (<code>registrations__race=race</code>) и 
+  чья регистрация не удалена (<code>registrations__deleted_at__isnull=True</code>). <code>.distinct()</code> нужен,
+   потому что <code>JOIN</code> по <code>registrations</code> даёт дубликаты</li>
+<li>Список автомобилей – только машины выбранного пользователя (<code>owner_id=user_id</code>)</li>
+<li>Если у пользователя одна машина – она сразу подставляется как <code>initial</code>, чтобы администратор не выбирал</li>
+<li>Параметр <code>user_id</code> приходит во view из GET или POST</li>
+</ul>
+<h2 id="3-viewspy">3. Представления (<code>views.py</code>)</h2>
+<h3 id="_7">Общие миксины</h3>
+<p><code>StaffRequiredMixin</code> — пускает только <code>is_staff</code>:</p>
+<pre><code class="language-python">class StaffRequiredMixin(UserPassesTestMixin):
+    def test_func(self):
+        return self.request.user.is_authenticated and self.request.user.is_staff
+
+    def handle_no_permission(self):
+        messages.error(self.request, &quot;Доступ только для администраторов.&quot;)
+        return redirect(&quot;races:race_list&quot;)
+</code></pre>
+<p>Наследуется от <code>UserPassesTestMixin</code>; при неудаче — редирект с флеш-сообщением</p>
+<p>Применяется к <code>RaceCreateView</code>, <code>RaceUpdateView</code>, <code>ResultCreateView</code></p>
+<h3 id="fbv">Функциональные представления (FBV)</h3>
+<h4 id="register"><code>register</code></h4>
+<p>Стандартный паттерн «форма → валидация → save → redirect». При успехе — сообщение и редирект на <code>/login/</code>. При ошибке — рендер формы с ошибками</p>
+<h4 id="profile-profile_edit"><code>profile</code> и <code>profile_edit</code></h4>
+<ul>
+<li><code>profile</code> — только GET, отдаёт профиль, форму авто для модалки и <code>my_results</code>, сортировка по <code>duration</code></li>
+<li><code>profile_edit</code> — GET/POST на <code>UserProfileForm</code></li>
+</ul>
+<p>Обе защищены <code>@login_required</code></p>
+<h4 id="public_profile"><code>public_profile</code></h4>
+<pre><code class="language-python">def public_profile(request, pk):
+    user_obj = get_object_or_404(User, pk=pk)
+    registrations = user_obj.registrations.select_related(&quot;race&quot;).all()
+    results = user_obj.results.select_related(&quot;race&quot;, &quot;auto&quot;).order_by(&quot;duration&quot;)
+    comments = user_obj.comments.select_related(&quot;race&quot;).all()
+    return render(request, &quot;races/public_profile.html&quot;, {
+        &quot;profile_user&quot;: user_obj,
+        &quot;registrations&quot;: registrations,
+        &quot;results&quot;: results,
+        &quot;comments&quot;: comments,
+    })
+</code></pre>
+<p><code>select_related</code> подтягивает связанные объекты одним JOIN'ом</p>
+<h4 id="participants"><code>participants</code></h4>
+<p>Пагинация через <code>Paginator</code>:</p>
+<pre><code class="language-python">def participants(request):
+    users = User.objects.filter(is_staff=False).order_by(&quot;last_name&quot;, &quot;first_name&quot;)
+    paginator = Paginator(users, 6)
+    page_number = request.GET.get(&quot;page&quot;)
+    page_obj = paginator.get_page(page_number)
+    return render(request, &quot;races/participants.html&quot;, {&quot;page_obj&quot;: page_obj})
+</code></pre>
+<h4 id="register_for_race-unregister_from_race"><code>register_for_race</code> и <code>unregister_from_race</code></h4>
+<p>Регистрация — POST-only, с проверкой на дубликат. Отмена — soft delete через <code>timezone.now()</code>, физически запись остаётся в БД:</p>
+<pre><code class="language-python">@login_required
+def unregister_from_race(request, pk):
+    registration = get_object_or_404(Registration, pk=pk, user=request.user, deleted_at__isnull=True)
+    race_pk = registration.race.pk
+    registration.deleted_at = timezone.now()
+    registration.save(update_fields=[&quot;deleted_at&quot;])
+    messages.success(request, &quot;Регистрация удалена.&quot;)
+    return redirect(&quot;races:race_detail&quot;, pk=race_pk)
+</code></pre>
+<p>Условие <code>user=request.user</code> не даёт отменить чужую регистрацию по прямому URL</p>
+<h4 id="add_comment"><code>add_comment</code></h4>
+<p>Проверка <code>is_valid</code> и установка <code>user</code> / <code>race</code> в обход формы, из <code>request.user</code> и URL. При ошибке валидации — флеш-сообщение, а не рендер формы, потому что форма живёт в модалке</p>
+<h4 id="results_table"><code>results_table</code></h4>
+<pre><code class="language-python">def results_table(request):
+    races = Race.objects.prefetch_related(Prefetch(&quot;results&quot;, queryset=Result.objects.filter(deleted_at__isnull=True).select_related(&quot;user&quot;, &quot;auto&quot;).order_by(&quot;duration&quot;), to_attr=&quot;sorted_results&quot;),).order_by(&quot;-date&quot;)
+    return render(request, &quot;races/results_table.html&quot;, {&quot;races&quot;: races})
+</code></pre>
+<ul>
+<li><code>Prefetch</code> с <code>to_attr</code> подгружает результаты одним запросом и кладёт их в <code>race.sorted_results</code> – отдельный список, чтобы не мешать стандартному <code>race.results</code></li>
+<li><code>.order_by("duration")</code> – сортировка по возрастанию, лучший первым</li>
+<li><code>select_related("user", "auto")</code> – JOIN на пользователя и авто</li>
+<li>Внешний <code>.order_by("-date")</code></li>
+</ul>
+<h3 id="cbv">Классовые представления (CBV)</h3>
+<h4 id="racelistview"><code>RaceListView</code></h4>
+<pre><code class="language-python">class RaceListView(ListView):
+    model = Race
+    template_name = &quot;races/race_list.html&quot;
+    context_object_name = &quot;races&quot;
+    paginate_by = 9
+
+    def get_queryset(self):
+        qs = Race.objects.all().order_by(&quot;-date&quot;)
+        q = self.request.GET.get(&quot;q&quot;)
+        loc = self.request.GET.get(&quot;location&quot;)
+        if q:
+            qs = qs.filter(name__icontains=q)
+        if loc:
+            qs = qs.filter(location__icontains=loc)
+        return qs
+</code></pre>
+<ul>
+<li><code>paginate_by = 9</code> – Django сам разбивает queryset на страницы и кладёт в контекст <code>page_obj</code></li>
+<li><code>get_queryset</code> реализует поиск по названию и месту через <code>icontains</code></li>
+<li>GET-параметры <code>q</code> / <code>location</code> сохраняются в <code>_pagination.html</code></li>
+</ul>
+<h4 id="racedetailview"><code>RaceDetailView</code></h4>
+<pre><code class="language-python">class RaceDetailView(DetailView):
+    model = Race
+    template_name = &quot;races/race_detail.html&quot;
+    context_object_name = &quot;race&quot;
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        race = self.object
+        context[&quot;registrations&quot;] = race.registrations.select_related(&quot;user&quot;).filter(deleted_at__isnull=True).all()
+        context['results'] = race.results.select_related('user', 'auto').filter(deleted_at__isnull=True).all().order_by(&quot;duration&quot;)
+        context['comments'] = race.comments.select_related('user').filter(deleted_at__isnull=True).all()
+        context[&quot;comment_form&quot;] = CommentForm(initial={&quot;race_date&quot;: race.date})
+        if self.request.user.is_authenticated:
+            context[&quot;my_registration&quot;] = race.registrations.filter(user=self.request.user, deleted_at__isnull=True).first()
+        return context
+</code></pre>
+<ul>
+<li>Один GET-запрос на страницу – все связанные данные подтягиваются одним <code>select_related</code></li>
+<li><code>my_registration</code> используется в шаблоне, чтобы отрисовать
+  либо кнопку «Зарегистрироваться», либо бейдж «Вы зарегистрированы»
+  с кнопкой «Отменить»</li>
+</ul>
+<h4 id="racecreateview-raceupdateview"><code>RaceCreateView</code> / <code>RaceUpdateView</code></h4>
+<pre><code class="language-python">class RaceCreateView(StaffRequiredMixin, CreateView):
+    model = Race
+    fields = [&quot;name&quot;, &quot;description&quot;, &quot;date&quot;, &quot;start_time&quot;, &quot;end_time&quot;, &quot;location&quot;]
+    template_name = &quot;races/race_form.html&quot;
+    success_url = reverse_lazy(&quot;races:race_list&quot;)
+
+    def form_valid(self, form):
+        messages.success(self.request, f&quot;Гонка «{form.instance.name}» создана.&quot;)
+        return super().form_valid(form)
+</code></pre>
+<pre><code class="language-python">class RaceUpdateView(StaffRequiredMixin, UpdateView):
+    model = Race
+    fields = [&quot;name&quot;, &quot;description&quot;, &quot;date&quot;, &quot;start_time&quot;, &quot;end_time&quot;, &quot;location&quot;]
+    template_name = &quot;races/race_form.html&quot;
+    success_url = reverse_lazy(&quot;races:race_list&quot;)
+</code></pre>
+<h4 id="resultcreateview"><code>ResultCreateView</code></h4>
+<p>Самый сложный CBV — с проверкой бизнес-правил:</p>
+<pre><code class="language-python">class ResultCreateView(StaffRequiredMixin, CreateView):
+    model = Result
+    form_class = ResultForm
+    template_name = &quot;races/result_form.html&quot;
+
+    def dispatch(self, request, *args, **kwargs):
+        self.race = get_object_or_404(Race, pk=kwargs[&quot;race_pk&quot;])
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs[&quot;race&quot;] = self.race
+        user_id = self.request.GET.get(&quot;user&quot;) or self.request.POST.get(&quot;user&quot;)
+        if user_id:
+            kwargs[&quot;user_id&quot;] = user_id
+        return kwargs
+
+    def get_initial(self):
+        initial = super().get_initial()
+        user_id = self.request.GET.get(&quot;user&quot;)
+        if user_id:
+            initial[&quot;user&quot;] = user_id
+        return initial
+
+    def form_valid(self, form):
+        user = form.cleaned_data[&quot;user&quot;]
+        auto = form.cleaned_data[&quot;auto&quot;]
+
+        if not Registration.objects.filter(user=user, race=self.race, deleted_at__isnull=True).exists():
+            form.add_error(&quot;user&quot;, &quot;Этот участник не зарегистрирован на гонку.&quot;)
+            return self.form_invalid(form)
+
+        if auto.owner_id != user.pk:
+            form.add_error(&quot;auto&quot;, &quot;Эта машина не принадлежит выбранному участнику.&quot;)
+            return self.form_invalid(form)
+
+        form.instance.race = self.race
+        messages.success(self.request, &quot;Результат добавлен.&quot;)
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy(&quot;races:race_detail&quot;, kwargs={&quot;pk&quot;: self.race.pk})
+</code></pre>
+<h4 id="autocreateview"><code>AutoCreateView</code></h4>
+<p>Простой <code>CreateView</code> с <code>LoginRequiredMixin</code> — владелец авто проставляется автоматически:</p>
+<pre><code class="language-python">class AutoCreateView(LoginRequiredMixin, CreateView):
+    model = Auto
+    form_class = AutoForm
+    template_name = &quot;races/auto_form.html&quot;
+    success_url = reverse_lazy(&quot;races:profile&quot;)
+
+    def form_valid(self, form):
+        form.instance.owner = self.request.user
+        messages.success(self.request, f&quot;Автомобиль {form.instance} добавлен.&quot;)
+        return super().form_valid(form)
+</code></pre>
+<h2 id="4-django-admin-adminpy">4. Django-admin (<code>admin.py</code>)</h2>
+<p>Все модели зарегистрированы с расширенными настройками, администратор работает не только через клиентский интерфейс, но и через стандартную панель</p>
+<h3 id="user-useradmin"><code>User</code> — расширенный <code>UserAdmin</code></h3>
+<pre><code class="language-python">@admin.register(User)
+class CustomUserAdmin(UserAdmin):
+    fieldsets = UserAdmin.fieldsets + ((&quot;Гонщик&quot;, {&quot;fields&quot;: (&quot;racer_class&quot;, &quot;team&quot;, &quot;birthday&quot;, &quot;driving_experience&quot;)}),)
+    list_display = (&quot;username&quot;, &quot;first_name&quot;, &quot;last_name&quot;, &quot;team&quot;, &quot;racer_class&quot;, &quot;is_staff&quot;, &quot;birthday&quot;, &quot;driving_experience&quot;)
+</code></pre>
+<ul>
+<li><code>fieldsets</code> дополняют стандартные секции <code>UserAdmin</code></li>
+<li><code>list_display</code> — все ключевые поля видны в списке без перехода в карточку</li>
+</ul>
+<h3 id="auto"><code>Auto</code></h3>
+<pre><code class="language-python">@admin.register(Auto)
+class AutoAdmin(admin.ModelAdmin):
+    list_display = (&quot;state&quot;, &quot;make&quot;, &quot;model&quot;, &quot;color&quot;, &quot;owner&quot;)
+    search_fields = (&quot;state&quot;, &quot;make&quot;, &quot;model&quot;)
+</code></pre>
+<p><code>list_display</code> + <code>search_fields</code> по <code>state / make / model</code> – поиск по госномеру и модели</p>
+<h3 id="race"><code>Race</code></h3>
+<pre><code class="language-python">@admin.register(Race)
+class RaceAdmin(admin.ModelAdmin):
+    list_display = (&quot;name&quot;, &quot;description&quot;, &quot;date&quot;, &quot;start_time&quot;, &quot;end_time&quot;, &quot;location&quot;)
+    list_filter = (&quot;date&quot;, &quot;location&quot;)
+    search_fields = (&quot;name&quot;, &quot;date&quot;, &quot;location&quot;)
+</code></pre>
+<p><code>list_filter</code> по <code>date</code> и <code>location</code>, <code>search_fields</code> по <code>name / date / location</code>. <code>list_display</code> включает все поля</p>
+<h3 id="result"><code>Result</code></h3>
+<pre><code class="language-python">@admin.register(Result)
+class ResultAdmin(admin.ModelAdmin):
+    list_display = (&quot;user&quot;, &quot;race&quot;, &quot;auto&quot;, &quot;duration&quot;)
+    list_filter = (&quot;race&quot;, &quot;user&quot;)
+    search_fields = (&quot;user&quot;, &quot;race&quot;)
+</code></pre>
+<p><code>list_filter</code> по <code>race</code> и <code>user</code>, <code>search_fields</code> по тем же полям</p>
+<h3 id="registration"><code>Registration</code></h3>
+<pre><code class="language-python">@admin.register(Registration)
+class RegistrationAdmin(admin.ModelAdmin):
+    list_display = (&quot;user&quot;, &quot;race&quot;, &quot;created_at&quot;)
+    list_filter = (&quot;race&quot;, &quot;user&quot;)
+    search_fields = (&quot;user&quot;, &quot;race&quot;, &quot;created_at&quot;)
+</code></pre>
+<p><code>list_display</code> включает <code>created_at</code> — видно, когда пользователь зарегистрировался. <code>list_filter</code> по гонке и пользователю</p>
+<h3 id="comment"><code>Comment</code></h3>
+<pre><code class="language-python">@admin.register(Comment)
+class CommentAdmin(admin.ModelAdmin):
+    list_display = (&quot;user&quot;, &quot;race&quot;, &quot;text&quot;, &quot;race_date&quot;, &quot;comment_type&quot;, &quot;rating&quot;, &quot;created_at&quot;)
+    list_filter = (&quot;comment_type&quot;, &quot;race&quot;)
+    search_fields = (&quot;text&quot;, &quot;user&quot;, &quot;race&quot;)
+</code></pre>
+<p><code>list_display</code> содержит все обязательные по заданию поля. Фильтры по типу и гонке</p>
+<hr />
+<h2 id="5">5. Шаблоны — кратко</h2>
+<p>Общий базовый шаблон <code>base.html</code> содержит навбар (с проверкой ролей через <code>{% if user.is_staff %}</code>), флеш-сообщения и подключение Bootstrap 5 в тёмной теме</p>
+<p>Ключевые страницы:</p>
+<table>
+<thead>
+<tr>
+<th>Шаблон</th>
+<th>Что содержит</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>race_list.html</code></td>
+<td>Карточки гонок + поиск + пагинация</td>
+</tr>
+<tr>
+<td><code>race_detail.html</code></td>
+<td>Табы «Участники / Результаты / Комментарии», модалки регистрации и комментария</td>
+</tr>
+<tr>
+<td><code>profile.html</code></td>
+<td>Профиль + модалка добавления авто</td>
+</tr>
+<tr>
+<td><code>results_table.html</code></td>
+<td>Общее табло</td>
+</tr>
+<tr>
+<td><code>participants.html</code></td>
+<td>Сетка карточек гонщиков</td>
+</tr>
+<tr>
+<td><code>public_profile.html</code></td>
+<td>Публичный профиль</td>
+</tr>
+<tr>
+<td><code>profile_edit.html</code></td>
+<td>Редактирование профиля</td>
+</tr>
+<tr>
+<td><code>race_form.html</code>, <code>result_form.html</code></td>
+<td>Админские формы</td>
+</tr>
+<tr>
+<td><code>register.html</code>, <code>login.html</code></td>
+<td>Аутентификация</td>
+</tr>
+<tr>
+<td><code>_pagination.html</code></td>
+<td>Partial с пагинацией, сохраняет GET-параметры</td>
+</tr>
+</tbody>
+</table>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../models/" class="btn btn-neutral float-left" title="Модель данных"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../models/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
